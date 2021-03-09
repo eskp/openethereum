@@ -14,9 +14,15 @@
 // You should have received a copy of the GNU General Public License
 // along with OpenEthereum.  If not, see <http://www.gnu.org/licenses/>.
 
+use crate::{
+    bytes::Bytes,
+    cli::{Args, ArgsError},
+    hash::keccak,
+    metrics::MetricsConfiguration,
+    miner::pool,
+    sync::{self, validate_node_url, NetworkConfiguration},
+};
 use ansi_term::Colour;
-use crate::bytes::Bytes;
-use crate::cli::{Args, ArgsError};
 use ethcore::{
     client::VMType,
     miner::{stratum, MinerOptions},
@@ -25,9 +31,6 @@ use ethcore::{
 };
 use ethereum_types::{Address, H256, U256};
 use ethkey::{Public, Secret};
-use crate::hash::keccak;
-use crate::metrics::MetricsConfiguration;
-use crate::miner::pool;
 use num_cpus;
 use parity_version::{version, version_data};
 use std::{
@@ -40,35 +43,37 @@ use std::{
     path::PathBuf,
     time::Duration,
 };
-use crate::sync::{self, validate_node_url, NetworkConfiguration};
 
-use crate::account::{AccountCmd, ImportAccounts, ListAccounts, NewAccount};
-use crate::blockchain::{
-    BlockchainCmd, ExportBlockchain, ExportState, ImportBlockchain, KillBlockchain, ResetBlockchain,
+use crate::{
+    account::{AccountCmd, ImportAccounts, ListAccounts, NewAccount},
+    blockchain::{
+        BlockchainCmd, ExportBlockchain, ExportState, ImportBlockchain, KillBlockchain,
+        ResetBlockchain,
+    },
+    cache::CacheConfig,
+    helpers::{
+        parity_ipc_path, to_address, to_addresses, to_block_id, to_bootnodes, to_duration, to_mode,
+        to_pending_set, to_price, to_queue_penalization, to_queue_strategy, to_u256,
+    },
+    network::IpFilter,
+    params::{AccountsConfig, GasPricerConfig, MinerExtras, ResealPolicy, SpecType},
+    presale::ImportWallet,
+    rpc::{HttpConfiguration, IpcConfiguration, WsConfiguration},
+    run::RunCmd,
+    secretstore::{
+        Configuration as SecretStoreConfiguration, ContractAddress as SecretStoreContractAddress,
+        NodeSecretKey,
+    },
+    snapshot::{self, SnapshotCommand},
+    types::data_format::DataFormat,
 };
-use crate::cache::CacheConfig;
 use dir::{
     self, default_data_path, default_local_path,
     helpers::{replace_home, replace_home_and_local},
     Directories,
 };
 use ethcore_logger::Config as LogConfig;
-use crate::helpers::{
-    parity_ipc_path, to_address, to_addresses, to_block_id, to_bootnodes, to_duration, to_mode,
-    to_pending_set, to_price, to_queue_penalization, to_queue_strategy, to_u256,
-};
-use crate::network::IpFilter;
-use crate::params::{AccountsConfig, GasPricerConfig, MinerExtras, ResealPolicy, SpecType};
 use parity_rpc::NetworkSettings;
-use crate::presale::ImportWallet;
-use crate::rpc::{HttpConfiguration, IpcConfiguration, WsConfiguration};
-use crate::run::RunCmd;
-use crate::secretstore::{
-    Configuration as SecretStoreConfiguration, ContractAddress as SecretStoreContractAddress,
-    NodeSecretKey,
-};
-use crate::snapshot::{self, SnapshotCommand};
-use crate::types::data_format::DataFormat;
 
 const DEFAULT_MAX_PEERS: u16 = 50;
 const DEFAULT_MIN_PEERS: u16 = 25;
@@ -1243,21 +1248,23 @@ fn into_secretstore_service_contract_address(
 mod tests {
     use std::{fs::File, io::Write, str::FromStr};
 
-    use crate::account::{AccountCmd, ImportAccounts, ListAccounts, NewAccount};
-    use crate::blockchain::{BlockchainCmd, ExportBlockchain, ExportState, ImportBlockchain};
-    use crate::cli::Args;
+    use crate::{
+        account::{AccountCmd, ImportAccounts, ListAccounts, NewAccount},
+        blockchain::{BlockchainCmd, ExportBlockchain, ExportState, ImportBlockchain},
+        cli::Args,
+        helpers::default_network_config,
+        miner::pool::PrioritizationStrategy,
+        params::SpecType,
+        presale::ImportWallet,
+        rpc::WsConfiguration,
+        rpc_apis::ApiSet,
+        run::RunCmd,
+        types::{data_format::DataFormat, ids::BlockId},
+    };
     use dir::Directories;
     use ethcore::{client::VMType, miner::MinerOptions};
-    use crate::helpers::default_network_config;
-    use crate::miner::pool::PrioritizationStrategy;
-    use crate::params::SpecType;
     use parity_rpc::NetworkSettings;
-    use crate::presale::ImportWallet;
-    use crate::rpc::WsConfiguration;
-    use crate::rpc_apis::ApiSet;
-    use crate::run::RunCmd;
     use tempdir::TempDir;
-    use crate::types::{data_format::DataFormat, ids::BlockId};
 
     use crate::network::{AllowIP, IpFilter};
 

@@ -901,8 +901,8 @@ impl From<SignedTransaction> for PendingTransaction {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use ethereum_types::U256;
     use crate::hash::keccak;
+    use ethereum_types::U256;
 
     #[test]
     fn sender_test() {

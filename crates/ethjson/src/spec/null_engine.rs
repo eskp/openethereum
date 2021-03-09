@@ -40,9 +40,9 @@ pub struct NullEngine {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use crate::uint::Uint;
     use ethereum_types::U256;
     use serde_json;
-    use crate::uint::Uint;
 
     #[test]
     fn null_engine_deserialization() {

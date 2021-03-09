@@ -53,9 +53,11 @@ pub fn execute(_cmd: AccountCmd) -> Result<String, String> {
 #[cfg(feature = "accounts")]
 mod command {
     use super::*;
-    use crate::accounts::{AccountProvider, AccountProviderSettings};
+    use crate::{
+        accounts::{AccountProvider, AccountProviderSettings},
+        helpers::{password_from_file, password_prompt},
+    };
     use ethstore::{accounts_dir::RootDiskDirectory, import_account, import_accounts, EthStore};
-    use crate::helpers::{password_from_file, password_prompt};
     use std::path::PathBuf;
 
     pub fn execute(cmd: AccountCmd) -> Result<String, String> {

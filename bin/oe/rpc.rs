@@ -16,8 +16,11 @@
 
 use std::{collections::HashSet, io, path::PathBuf, sync::Arc};
 
+use crate::{
+    helpers::parity_ipc_path,
+    rpc_apis::{self, ApiSet},
+};
 use dir::{default_data_path, helpers::replace_home};
-use crate::helpers::parity_ipc_path;
 use jsonrpc_core::MetaIoHandler;
 use parity_rpc::{
     self as rpc,
@@ -25,7 +28,6 @@ use parity_rpc::{
     DomainsValidation, Metadata,
 };
 use parity_runtime::Executor;
-use crate::rpc_apis::{self, ApiSet};
 
 pub use parity_rpc::{HttpServer, IpcServer, RequestMiddleware};
 //pub use parity_rpc::ws::Server as WsServer;

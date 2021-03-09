@@ -44,8 +44,8 @@ pub struct PostState {
 
 #[cfg(test)]
 mod tests {
-    use serde_json;
     use super::TransactionTest;
+    use serde_json;
 
     #[test]
     fn transaction_deserialization() {

@@ -22,6 +22,7 @@ use std::{
     time::Duration,
 };
 
+use crate::{hash::keccak, types::ids::BlockId};
 use ethcore::{
     client::{DatabaseCompactionProfile, Mode, VMType},
     miner::Miner,
@@ -32,15 +33,15 @@ use ethcore::{
     },
 };
 use ethcore_service::ClientService;
-use crate::hash::keccak;
-use crate::types::ids::BlockId;
 
-use crate::cache::CacheConfig;
-use crate::db;
+use crate::{
+    cache::CacheConfig,
+    db,
+    helpers::{execute_upgrades, to_client_config},
+    params::{fatdb_switch_to_bool, tracing_switch_to_bool, Pruning, SpecType, Switch},
+    user_defaults::UserDefaults,
+};
 use dir::Directories;
-use crate::helpers::{execute_upgrades, to_client_config};
-use crate::params::{fatdb_switch_to_bool, tracing_switch_to_bool, Pruning, SpecType, Switch};
-use crate::user_defaults::UserDefaults;
 
 /// Kinds of snapshot commands.
 #[derive(Debug, PartialEq, Clone, Copy)]

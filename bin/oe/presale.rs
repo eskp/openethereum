@@ -14,10 +14,12 @@
 // You should have received a copy of the GNU General Public License
 // along with OpenEthereum.  If not, see <http://www.gnu.org/licenses/>.
 
+use crate::{
+    helpers::{password_from_file, password_prompt},
+    params::SpecType,
+};
 use ethkey::Password;
 use ethstore::PresaleWallet;
-use crate::helpers::{password_from_file, password_prompt};
-use crate::params::SpecType;
 use std::num::NonZeroU32;
 
 #[derive(Debug, PartialEq)]

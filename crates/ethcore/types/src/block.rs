@@ -33,8 +33,10 @@
 
 use crate::bytes::Bytes;
 
-use crate::header::Header;
-use crate::transaction::{TypedTransaction, UnverifiedTransaction};
+use crate::{
+    header::Header,
+    transaction::{TypedTransaction, UnverifiedTransaction},
+};
 use rlp::{Decodable, DecoderError, Rlp, RlpStream};
 
 /// A block, encoded as it is on the block chain.

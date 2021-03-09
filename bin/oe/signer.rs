@@ -19,12 +19,10 @@ use std::{
     path::{Path, PathBuf},
 };
 
+use crate::{path::restrict_permissions_owner, rpc, rpc_apis};
 use ansi_term::Colour::White;
 use ethcore_logger::Config as LogConfig;
 use parity_rpc;
-use crate::path::restrict_permissions_owner;
-use crate::rpc;
-use crate::rpc_apis;
 
 pub const CODES_FILENAME: &'static str = "authcodes";
 

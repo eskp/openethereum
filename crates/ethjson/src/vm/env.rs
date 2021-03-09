@@ -39,8 +39,8 @@ pub struct Env {
 
 #[cfg(test)]
 mod tests {
-    use serde_json;
     use super::Env;
+    use serde_json;
 
     #[test]
     fn env_deserialization() {

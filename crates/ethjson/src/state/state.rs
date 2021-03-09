@@ -47,8 +47,8 @@ pub struct State {
 
 #[cfg(test)]
 mod tests {
-    use serde_json;
     use super::State;
+    use serde_json;
 
     #[test]
     fn state_deserialization() {

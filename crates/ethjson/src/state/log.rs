@@ -36,8 +36,8 @@ pub struct Log {
 
 #[cfg(test)]
 mod tests {
-    use serde_json;
     use super::Log;
+    use serde_json;
 
     #[test]
     fn log_deserialization() {
