@@ -16,6 +16,12 @@
 
 //! State test transaction deserialization.
 
+use common_types::transaction::{
+    Action, SignedTransaction, Transaction as CoreTransaction, TypedTransaction,
+};
+
+use ethkey::Secret;
+
 use crate::{
     bytes::Bytes,
     hash::{Address, H256},
@@ -44,7 +50,6 @@ pub struct Transaction {
     pub value: Uint,
 }
 
-#[cfg(any(test, feature = "test-helpers"))]
 impl From<Transaction> for SignedTransaction {
     fn from(t: Transaction) -> Self {
         let to: Option<Address> = t.to.into();
