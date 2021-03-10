@@ -17,9 +17,11 @@
 //! Receipt
 
 use super::transaction::TypedTxId;
-use ethereum_types::{Address, Bloom, H160, H256, U256};
+use ethereum_types::{Address, Bloom, BloomInput, H160, H256, U256};
 use heapsize::HeapSizeOf;
+use inflate::inflate_bytes;
 use rlp::{DecoderError, Rlp, RlpStream};
+use serde::{Deserialize, Deserializer};
 use std::ops::{Deref, DerefMut};
 
 use crate::{
@@ -28,7 +30,8 @@ use crate::{
 };
 
 /// Transaction outcome store in the receipt.
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[serde(rename_all = "camelCase")]
+#[derive(Debug, Clone, PartialEq, Eq, Deserialize)]
 pub enum TransactionOutcome {
     /// Status and state root are unknown under EIP-98 rules.
     Unknown,
@@ -39,11 +42,13 @@ pub enum TransactionOutcome {
 }
 
 /// Information describing execution of a transaction.
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[serde(rename_all = "camelCase")]
+#[derive(Debug, Clone, PartialEq, Eq, Deserialize)]
 pub struct LegacyReceipt {
     /// The total gas used in the block following execution of the transaction.
     pub gas_used: U256,
     /// The OR-wide combination of all logs' blooms for this transaction.
+    #[serde(deserialize_with = "deserialize_bloom")]
     pub log_bloom: Bloom,
     /// The logs stemming from this transaction.
     pub logs: Vec<LogEntry>,
@@ -108,7 +113,8 @@ impl LegacyReceipt {
     }
 }
 
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[serde(rename_all = "camelCase")]
+#[derive(Debug, Clone, PartialEq, Eq, Deserialize)]
 pub enum TypedReceipt {
     Legacy(LegacyReceipt),
     AccessList(LegacyReceipt),
@@ -299,6 +305,16 @@ pub struct LocalizedReceipt {
     pub to: Option<H160>,
     /// Sender
     pub from: H160,
+}
+
+fn deserialize_bloom<'de, D>(deserializer: D) -> Result<Bloom, D::Error>
+where
+  D: Deserializer<'de>,
+{
+  let hexstr = String::deserialize(deserializer)?;
+  let compressed = hex::decode(&hexstr[2..]).unwrap();
+  let bytes = inflate_bytes(&compressed).unwrap();
+  Ok(Bloom::from(BloomInput::Raw(&bytes)))
 }
 
 #[cfg(test)]

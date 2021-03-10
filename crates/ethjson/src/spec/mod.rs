@@ -30,6 +30,7 @@ pub mod params;
 pub mod seal;
 pub mod spec;
 pub mod state;
+pub mod frozen;
 pub mod validator_set;
 
 pub use self::{

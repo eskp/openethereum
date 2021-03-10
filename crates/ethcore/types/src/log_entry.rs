@@ -19,17 +19,19 @@
 use ethereum_types::{Address, Bloom, BloomInput, H256};
 use heapsize::HeapSizeOf;
 use std::ops::Deref;
-
+use serde::{Deserialize, Deserializer};
 use crate::{bytes::Bytes, BlockNumber};
 
 /// A record of execution for a `LOG` operation.
-#[derive(Default, Debug, Clone, PartialEq, Eq, RlpEncodable, RlpDecodable)]
+#[serde(rename_all="camelCase")]
+#[derive(Default, Debug, Clone, PartialEq, Eq, RlpEncodable, RlpDecodable, Deserialize)]
 pub struct LogEntry {
     /// The address of the contract executing at the point of the `LOG` operation.
     pub address: Address,
     /// The topics associated with the `LOG` operation.
     pub topics: Vec<H256>,
     /// The data associated with the `LOG` operation.
+    #[serde(deserialize_with="deserialize_bytes")]
     pub data: Bytes,
 }
 
@@ -49,6 +51,15 @@ impl LogEntry {
                 b
             })
     }
+}
+
+
+fn deserialize_bytes<'de, D>(deserializer: D) -> Result<Vec<u8>, D::Error>
+where
+  D: Deserializer<'de>,
+{
+  let hexstr = String::deserialize(deserializer)?;
+  Ok(hex::decode(&hexstr[2..]).unwrap())
 }
 
 /// Log localized in a blockchain.
