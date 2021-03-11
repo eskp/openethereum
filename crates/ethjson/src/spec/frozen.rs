@@ -163,43 +163,44 @@ mod tests {
     use std::str::FromStr;
 
     use common_types::receipt::{TransactionOutcome, TypedReceipt};
+    use ethereum_types::Bloom;
 
     use super::*;
 
     #[test]
     fn can_deserialize_frozen_block() {
         let serialized_block = br#"{
-            "8519876": [
+            "9340615": [
                 {
-                  "id": "0x5c09d643b9f6a7cf9065e1ee2f47223ff74592428cb1181b4286145d4925504c",
+                  "id": "0xbcba4ff3e38eeb3da6dddae4a0fdd264191e62582767db60a0798cae89dabbc5",
                   "balanceOps": [
                     {
-                      "account": "0x1f256d9fd1fbb4b514784584557751b0e2f81185",
-                      "amount": "0x2b6a067727c000",
+                      "account": "0x4af013afbadb22d8a88c92d68fc96b033b9ebb8a",
+                      "amount": "0x5af3107a40000",
                       "op": "sub"
                     },
                     {
-                      "account": "0x1f256d9fd1fbb4b514784584557751b0e2f81185",
-                      "amount": "0x28983165f80a00",
+                      "account": "0x4af013afbadb22d8a88c92d68fc96b033b9ebb8a",
+                      "amount": "0x5779b95c67200",
                       "op": "add"
                     },
                     {
-                      "account": "0x0010f94b296a852aaac52ea6c5ac72e03afd032d",
-                      "amount": "0x2d1d5112fb600",
+                      "account": "0x0020ee4be0e2027d76603cb751ee069519ba81a1",
+                      "amount": "0x379571dd8e00",
                       "op": "add"
-                    }
+                    }            
                   ],
                   "storageChanges": [
                     {
-                      "account": "0x6ae08857a7ed8f5550e6b887d15c6e9754409298",
-                      "key": "0x00100000000000000000000001f256d9fd1fbb4b514784584557751b0e2f8118",
-                      "value": "0x9895b"
+                      "account": "0xc6004fbd8437201472f6d6dff362dbc4233f03f1",
+                      "key": "0x00100000000000000000000004af013afbadb22d8a88c92d68fc96b033b9ebb8",
+                      "value": "0x98929"
                     },
                     {
-                      "account": "0x6ae08857a7ed8f5550e6b887d15c6e9754409298",
-                      "key": "0x00100000000000000000000004206a77410c2a11a6a1adfb2f456eb9f4b2672b",
-                      "value": "0xc"
-                    }
+                      "account": "0xc6004fbd8437201472f6d6dff362dbc4233f03f1",
+                      "key": "0x0010000000000000000000000cafe0854989c15301de5cf580a39015de48df4f",
+                      "value": "0x3e"
+                    }            
                   ],
                   "receipt": {
                     "legacy": {
@@ -228,7 +229,7 @@ mod tests {
         let deserialized = restore_frozen_state(std::io::Cursor::new(serialized_block)).unwrap();
         assert_eq!(deserialized.len(), 1);
 
-        let known_block = deserialized.get(&8519876u64);
+        let known_block = deserialized.get(&9340615u64);
         assert_eq!(known_block.is_some(), true);
 
         if let Some(transactions) = known_block {
@@ -241,78 +242,115 @@ mod tests {
                 assert_eq!(
                     tx.id,
                     H256::from_str(
-                        "5c09d643b9f6a7cf9065e1ee2f47223ff74592428cb1181b4286145d4925504c"
+                        "bcba4ff3e38eeb3da6dddae4a0fdd264191e62582767db60a0798cae89dabbc5"
                     )
                     .unwrap()
                 );
 
                 assert_eq!(
                     tx.balance_ops[0].account,
-                    Address::from_str("1f256d9fd1fbb4b514784584557751b0e2f81185").unwrap()
+                    Address::from_str("4af013afbadb22d8a88c92d68fc96b033b9ebb8a").unwrap()
                 );
                 assert_eq!(
                     tx.balance_ops[0].amount,
-                    U256::from_str("2b6a067727c000").unwrap()
+                    U256::from_str("5af3107a40000").unwrap()
                 );
                 assert_eq!(tx.balance_ops[0].op, Op::Sub);
 
                 assert_eq!(
                     tx.balance_ops[1].account,
-                    Address::from_str("1f256d9fd1fbb4b514784584557751b0e2f81185").unwrap()
+                    Address::from_str("4af013afbadb22d8a88c92d68fc96b033b9ebb8a").unwrap()
                 );
                 assert_eq!(
                     tx.balance_ops[1].amount,
-                    U256::from_str("28983165f80a00").unwrap()
+                    U256::from_str("5779b95c67200").unwrap()
                 );
                 assert_eq!(tx.balance_ops[1].op, Op::Add);
 
                 assert_eq!(
                     tx.balance_ops[2].account,
-                    Address::from_str("0010f94b296a852aaac52ea6c5ac72e03afd032d").unwrap()
+                    Address::from_str("0020ee4be0e2027d76603cb751ee069519ba81a1").unwrap()
                 );
                 assert_eq!(
                     tx.balance_ops[2].amount,
-                    U256::from_str("2d1d5112fb600").unwrap()
+                    U256::from_str("379571dd8e00").unwrap()
                 );
                 assert_eq!(tx.balance_ops[2].op, Op::Add);
 
                 assert_eq!(
                     tx.storage_changes[0].account,
-                    Address::from_str("6ae08857a7ed8f5550e6b887d15c6e9754409298").unwrap()
+                    Address::from_str("c6004fbd8437201472f6d6dff362dbc4233f03f1").unwrap()
                 );
 
                 assert_eq!(
                     tx.storage_changes[0].key,
                     H256::from_str(
-                        "00100000000000000000000001f256d9fd1fbb4b514784584557751b0e2f8118"
+                        "00100000000000000000000004af013afbadb22d8a88c92d68fc96b033b9ebb8"
                     )
                     .unwrap()
                 );
 
                 assert_eq!(
                     tx.storage_changes[0].value,
-                    U256::from_str("9895b").unwrap()
+                    U256::from_str("98929").unwrap()
                 );
 
                 assert_eq!(
                     tx.storage_changes[1].account,
-                    Address::from_str("6ae08857a7ed8f5550e6b887d15c6e9754409298").unwrap()
+                    Address::from_str("c6004fbd8437201472f6d6dff362dbc4233f03f1").unwrap()
                 );
 
                 assert_eq!(
                     tx.storage_changes[1].key,
                     H256::from_str(
-                        "00100000000000000000000004206a77410c2a11a6a1adfb2f456eb9f4b2672b"
+                        "0010000000000000000000000cafe0854989c15301de5cf580a39015de48df4f"
                     )
                     .unwrap()
                 );
 
-                assert_eq!(tx.storage_changes[1].value, U256::from_str("c").unwrap());
+                assert_eq!(tx.storage_changes[1].value, U256::from_str("3e").unwrap());
 
                 if let TypedReceipt::Legacy(ref receipt) = tx.receipt {
                     assert_eq!(receipt.gas_used, U256::from_str("655db").unwrap());
                     assert_eq!(receipt.outcome, TransactionOutcome::StatusCode(1));
                     assert_eq!(receipt.logs.len(), 1);
+                    assert_eq!(receipt.log_bloom, Bloom::from_str("00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000010000010000000000008000000000000000000000000000000000000040000000000000000000000000000000000010000400000000000000010000000000000000000000008000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000102000000000000000000000000000000000000000200004000000000000000000000000000000000000000000000000000000000000000000000000000").unwrap());
+
+                    assert_eq!(
+                        receipt.logs[0].address,
+                        Address::from_str("c6004fbd8437201472f6d6dff362dbc4233f03f1").unwrap()
+                    );
+                    assert_eq!(receipt.logs[0].topics.len(), 3);
+
+                    assert_eq!(
+                        receipt.logs[0].topics[0],
+                        H256::from_str(
+                            "ddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef"
+                        )
+                        .unwrap()
+                    );
+                    assert_eq!(
+                        receipt.logs[0].topics[1],
+                        H256::from_str(
+                            "0000000000000000000000004af013afbadb22d8a88c92d68fc96b033b9ebb8a"
+                        )
+                        .unwrap()
+                    );
+                    assert_eq!(
+                        receipt.logs[0].topics[2],
+                        H256::from_str(
+                            "000000000000000000000000cafe0854989c15301de5cf580a39015de48df4f8"
+                        )
+                        .unwrap()
+                    );
+
+                    assert_eq!(
+                        receipt.logs[0].data,
+                        vec![
+                            0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                            0, 0, 0, 0, 0, 0, 3, 232
+                        ]
+                    );
                 } else {
                     assert!(false);
                 }

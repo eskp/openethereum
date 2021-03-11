@@ -309,12 +309,12 @@ pub struct LocalizedReceipt {
 
 fn deserialize_bloom<'de, D>(deserializer: D) -> Result<Bloom, D::Error>
 where
-  D: Deserializer<'de>,
+    D: Deserializer<'de>,
 {
-  let hexstr = String::deserialize(deserializer)?;
-  let compressed = hex::decode(&hexstr[2..]).unwrap();
-  let bytes = inflate_bytes(&compressed).unwrap();
-  Ok(Bloom::from(BloomInput::Raw(&bytes)))
+    let hexstr = String::deserialize(deserializer)?;
+    let compressed = hex::decode(&hexstr[2..]).unwrap();
+    let bytes = inflate_bytes(&compressed).unwrap();
+    Ok(Bloom::from_slice(&bytes))
 }
 
 #[cfg(test)]
